@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { useToast } from '../../context/ToastContext';
 import { gdprApi } from '../../services/api/gdprApi';
 
 interface PrivacyGDPRSectionProps {
@@ -19,6 +20,7 @@ export const PrivacyGDPRSection: React.FC<PrivacyGDPRSectionProps> = ({
 }) => {
   const router = useRouter();
   const { setUser } = useUser();
+  const { showToast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const handleExportData = async () => {
     if (onExportData) {
@@ -27,26 +29,20 @@ export const PrivacyGDPRSection: React.FC<PrivacyGDPRSectionProps> = ({
     }
 
     try {
-      // Show loading indicator
       Alert.alert('Export Data', 'Preparing your data for download...', [{ text: 'OK' }]);
-
-      // Call the GDPR export API
       const response = await gdprApi.exportData();
 
       if (response.success && response.data) {
-    
-        console.log('Exported user data:', response.data);
 
         Alert.alert(
           'Export Successful',
-          'Your data has been exported successfully. Check the console for the exported data.',
+          'Your data has been exported successfully.',
           [{ text: 'OK' }]
         );
       } else {
         throw new Error(response.message || 'Export failed');
       }
     } catch (error: any) {
-      console.error('Error exporting data:', error);
       const errorMessage = error?.response?.data?.message || error.message || 'Failed to export data. Please try again.';
       Alert.alert(
         'Export Failed',
@@ -56,14 +52,25 @@ export const PrivacyGDPRSection: React.FC<PrivacyGDPRSectionProps> = ({
     }
   };
 
-  const handleCookieConsent = (action: 'allow' | 'deny') => {
-    if (onCookieConsent) {
-      onCookieConsent(action);
-    } else {
-      const message = action === 'allow'
-        ? 'Cookie consent has been granted. You can manage your preferences anytime.'
-        : 'Cookie consent has been denied. Some features may be limited.';
-      Alert.alert('Cookie Consent', message, [{ text: 'OK' }]);
+  const handleCookieConsent = async (action: 'allow' | 'deny') => {
+    try {
+      const granted = action === 'allow' ? true : false;
+      const payload = {
+        policyVersion: '1.0',
+        granted: granted,
+      };
+      const response = await gdprApi.cookieConsent(payload);
+
+      if (response.success) {
+        // showToast('success', response.message || 'Cookie consent updated successfully');
+        alert(response.message || 'Cookie consent updated successfully')
+      } else {
+        throw new Error(response.message || 'Failed to update cookie consent');
+      }
+    } catch (error: any) {
+      // showToast('error', error.message || 'Failed to update cookie consent. Please try again.');
+      alert(error.message || 'Failed to update cookie consent. Please try again.');
+
     }
   };
 
@@ -73,13 +80,15 @@ export const PrivacyGDPRSection: React.FC<PrivacyGDPRSectionProps> = ({
 
   const executeDeleteAccount = async () => {
     try {
-      await gdprApi.deleteAccount();
+      const response = await gdprApi.deleteAccount();
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to delete account');
+      }
+      router.push('/auth/Login' as any);
       await AsyncStorage.removeItem('authToken');
-      router.replace('/auth/Login');
-      alert('Account deleted successfully');
-    } catch (error) {
-      console.error('Error deleting account:', error);
-      alert('Failed to delete account. Please try again.');
+
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete account. Please try again.');
     } finally {
       setShowDeleteModal(false);
     }
@@ -87,76 +96,76 @@ export const PrivacyGDPRSection: React.FC<PrivacyGDPRSectionProps> = ({
 
   return (
     <>
-    <View style={styles.privacySection}>
-      <View style={styles.privacyHeader}>
-        <Ionicons name="shield-checkmark" size={20} color="#34495E" />
-        <Text style={styles.privacyTitle}>Privacy & GDPR</Text>
-      </View>
-
-      {/* Export My Data */}
-      <View style={styles.privacyCard}>
-        <View style={styles.privacyCardContent}>
-          <View style={styles.privacyCardLeft}>
-            <Text style={styles.privacyCardTitle}>Export my data</Text>
-            <Text style={styles.privacyCardDescription}>
-              Download a copy of all your personal data and account information
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.exportButton}
-            onPress={handleExportData}
-          >
-            <Ionicons name="download-outline" size={16} color="#fff" />
-            <Text style={styles.exportButtonText}>Export</Text>
-          </TouchableOpacity>
+      <View style={styles.privacySection}>
+        <View style={styles.privacyHeader}>
+          <Ionicons name="shield-checkmark" size={20} color="#34495E" />
+          <Text style={styles.privacyTitle}>Privacy & GDPR</Text>
         </View>
-      </View>
 
-      {/* Cookie Consent */}
-      <View style={styles.privacyCard}>
-        <View style={styles.privacyCardContent}>
-          <View style={styles.privacyCardLeft}>
-            <Text style={styles.privacyCardTitle}>Cookie consent</Text>
-            <Text style={styles.privacyCardDescription}>
-              Manage your cookie preferences and data tracking settings
-            </Text>
-          </View>
-          <View style={styles.cookieButtons}>
+        {/* Export My Data */}
+        <View style={styles.privacyCard}>
+          <View style={styles.privacyCardContent}>
+            <View style={styles.privacyCardLeft}>
+              <Text style={styles.privacyCardTitle}>Export my data</Text>
+              <Text style={styles.privacyCardDescription}>
+                Download a copy of all your personal data and account information
+              </Text>
+            </View>
             <TouchableOpacity
-              style={styles.allowButton}
-              onPress={() => handleCookieConsent('allow')}
+              style={styles.exportButton}
+              onPress={handleExportData}
             >
-              <Text style={styles.allowButtonText}>Allow</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.denyButton}
-              onPress={() => handleCookieConsent('deny')}
-            >
-              <Text style={styles.denyButtonText}>Deny</Text>
+              <Ionicons name="download-outline" size={16} color="#fff" />
+              <Text style={styles.exportButtonText}>Export</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </View>
 
-      {/* Delete My Account */}
-      <View style={styles.deleteAccountCard}>
-        <View style={styles.privacyCardContent}>
-          <View style={styles.privacyCardLeft}>
-            <Text style={styles.deleteAccountTitle}>Delete my account</Text>
-            <Text style={styles.privacyCardDescription}>
-              Permanently delete your account and all associated data. This action cannot be undone.
-            </Text>
+        {/* Cookie Consent */}
+        <View style={styles.privacyCard}>
+          <View style={styles.privacyCardContent}>
+            <View style={styles.privacyCardLeft}>
+              <Text style={styles.privacyCardTitle}>Cookie consent</Text>
+              <Text style={styles.privacyCardDescription}>
+                Manage your cookie preferences and data tracking settings
+              </Text>
+            </View>
+            <View style={styles.cookieButtons}>
+              <TouchableOpacity
+                style={styles.allowButton}
+                onPress={() => handleCookieConsent('allow')}
+              >
+                <Text style={styles.allowButtonText}>Allow</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.denyButton}
+                onPress={() => handleCookieConsent('deny')}
+              >
+                <Text style={styles.denyButtonText}>Deny</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleDeleteAccount}
-          >
-            <Ionicons name="trash-outline" size={16} color="#fff" />
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </TouchableOpacity>
+        </View>
+
+        {/* Delete My Account */}
+        <View style={styles.deleteAccountCard}>
+          <View style={styles.privacyCardContent}>
+            <View style={styles.privacyCardLeft}>
+              <Text style={styles.deleteAccountTitle}>Delete my account</Text>
+              <Text style={styles.privacyCardDescription}>
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDeleteAccount}
+            >
+              <Ionicons name="trash-outline" size={16} color="#fff" />
+              <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
 
       <Modal
         animationType="fade"
@@ -191,7 +200,8 @@ export const PrivacyGDPRSection: React.FC<PrivacyGDPRSectionProps> = ({
         </Pressable>
       </Modal>
     </>
-  );};
+  );
+};
 
 const styles = StyleSheet.create({
   // Privacy & GDPR Styles
