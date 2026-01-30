@@ -1,0 +1,167 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ECF0F1',
+  },
+  header: {
+    backgroundColor: '#34495E',
+    paddingTop: 60,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  progressContainer: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#ECF0F1',
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#7F8C8D',
+    textAlign: 'center',
+  },
+  contentContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 120, // Space for bottom buttons
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  fieldRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  fieldLabel: {
+    width: 120,
+    fontSize: 15,
+    color: '#2C3E50',
+    fontWeight: '500',
+  },
+  imageButton: {
+    backgroundColor: '#34495E',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  previewImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginVertical: 10,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#BDC3C7',
+  },
+  dayRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#BDC3C7',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#34495E',
+  },
+  checked: {
+    backgroundColor: '#34495E',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#ECF0F1',
+    borderTopWidth: 1,
+    borderTopColor: '#BDC3C7',
+    gap: 12,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  jumpButton: {
+    flex: 1,
+    backgroundColor: '#34495E',
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButton: {
+    flex: 1,
+    backgroundColor: '#34495E',
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  // Map styles (for Step 2)
+  mapSection: {
+    marginTop: 24,
+  },
+  mapLabelContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  mapLabel: {
+    fontSize: 15,
+    color: '#2C3E50',
+    fontWeight: '500',
+  },
+  geocodingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  geocodingText: {
+    fontSize: 12,
+    color: '#2C5F8D',
+  },
+  mapContainer: {
+    height: 250,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#BDC3C7',
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+});

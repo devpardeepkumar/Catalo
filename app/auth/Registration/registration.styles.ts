@@ -1,0 +1,177 @@
+import { Platform, StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+   // paddingBottom: 30,
+    padding: 20
+  },
+  mainContainer:{
+   backgroundColor: "#7A818A",
+    paddingTop: Platform.OS === "ios" ? 68 : 40, 
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+    //flexDirection: "row",
+    //alignItems: "center",
+    //justifyContent: "space-between",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    paddingBottom: 20,
+    backgroundColor: "#34495E",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  title: {
+    flex: 1,
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#fff'
+  },
+  label: { fontSize: Platform.OS === 'ios' ? 14 : 12,  marginBottom: 5, fontWeight: '500' },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+    marginBottom:8,
+  },
+  uploadButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 14,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  errorText: { color: '#d32f2f', fontSize: 14, marginTop: 4 },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    borderColor: '#d32f2f',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  footer: {
+    backgroundColor: "#ffff",
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    paddingTop: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  termsContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  termsText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  underlinedText: {
+    textDecorationLine: 'underline',
+    color: '#34495E',
+    fontWeight: '500',
+  },
+  loginLinkContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginTop: 10,
+  },
+  loginLinkText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  loginLink: {
+    color: '#34495E',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  pickerContainer: {
+    marginBottom: 15,
+  },
+  pickerLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
+    color: '#333',
+  },
+  genderOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  genderOption: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginHorizontal: 2,
+    backgroundColor: '#fff',
+  },
+  genderOptionSelected: {
+    borderColor: '#34495E',
+    backgroundColor: '#34495E',
+  },
+  genderOptionText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  genderOptionTextSelected: {
+    color: '#fff',
+    fontWeight: '500',
+  },
+  switchContainer: {
+    marginBottom: 15,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    backgroundColor: '#fff',
+  },
+  checkboxChecked: {
+    borderColor: '#34495E',
+    backgroundColor: '#34495E',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  switchLabel: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+  },
+});
