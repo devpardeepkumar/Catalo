@@ -20,6 +20,7 @@ interface ColumnMappingSectionProps {
   csvHeaders: string[];
   sampleRows: any[];
   uploadId: string;
+  updateOnlyExisting?: boolean;
   onBack: () => void;
   onProcessUpload: (mappings: ColumnMapping[]) => void;
 }
@@ -39,12 +40,12 @@ const PLATFORM_FIELDS: PlatformField[] = [
 export const ColumnMappingSection: React.FC<ColumnMappingSectionProps> = ({
   csvHeaders,
   uploadId,
+  updateOnlyExisting = false,
   onBack,
   onProcessUpload,
   sampleRows,
 }) => {
   const [mappings, setMappings] = useState<ColumnMapping[]>([]);
-  console.log("check the upload data ", uploadId)
   useEffect(() => {
     // Initialize mappings with all CSV headers
     const initialMappings: ColumnMapping[] = csvHeaders.map((header) => ({
@@ -92,18 +93,36 @@ export const ColumnMappingSection: React.FC<ColumnMappingSectionProps> = ({
       return;
     }
 
-      try {
-        // Call the import API with mappings
-        const response = await apiClient.post(`/retailers/inventory/csv/import/${uploadId}`, {
-          mappings: mappings
-        });
-      console.log('Import API response:', response.data);
+    if (!uploadId) {
+      Alert.alert('Error', 'Upload ID is missing. Please upload the CSV again.');
+      return;
+    }
 
-      // Call the parent handler to process upload
-      onProcessUpload(mappings);
-    } catch (error) {
+    try {
+      // Build body mappings: backend expects Record<platformField, csvHeader>
+      const bodyMappings: Record<string, string> = {};
+      mappings
+        .filter((m) => m.platformField)
+        .forEach((m) => {
+          // Backend expects manufacturerProductCode; UI uses manufacturerCode
+          const key = m.platformField === 'manufacturerCode' ? 'manufacturerProductCode' : m.platformField!;
+          bodyMappings[key] = m.csvHeader;
+        });
+
+      const response = await apiClient.post(`/retailers/inventory/csv/import/${uploadId}`, {
+        mappings: bodyMappings,
+        updateOnlyExisting,
+      });
+
+      if (response.data?.success) {
+        onProcessUpload(mappings);
+      } else {
+        Alert.alert('Error', response.data?.error?.message || 'Failed to process upload');
+      }
+    } catch (error: any) {
       console.error('Error calling import API:', error);
-      Alert.alert('Error', 'Failed to process upload');
+      const message = error?.response?.data?.error?.message || 'Failed to process upload';
+      Alert.alert('Error', message);
     }
   };
 
