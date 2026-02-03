@@ -1,14 +1,16 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert } from 'react-native';
+import { ActivityIndicator, Alert, Text, View } from 'react-native';
 import { Product } from '../../types/product';
 import { Table, TableAction, TableColumn } from './Table';
+import { styles } from '../../styles/components/inventory/Table';
 
 export type TabType = 'published' | 'to_be_published' | 'without_info';
 
 interface TabContentRendererProps {
   activeTab: TabType;
   displayedProducts: Product[];
+  loading?: boolean;
   tableColumns: TableColumn[];
   tableActions: TableAction[];
   onProductPress: (product: Product) => void;
@@ -17,11 +19,21 @@ interface TabContentRendererProps {
 export const TabContentRenderer: React.FC<TabContentRendererProps> = ({
   activeTab,
   displayedProducts,
+  loading = false,
   tableColumns,
   tableActions,
   onProductPress,
 }) => {
   const router = useRouter();
+
+  if (loading) {
+    return (
+      <View style={[styles.tableWrapper, { justifyContent: 'center', alignItems: 'center', minHeight: 200 }]}>
+        <ActivityIndicator size="large" color="#3498DB" />
+        <Text style={{ marginTop: 12, color: '#7F8C8D', fontSize: 14 }}>Loading products...</Text>
+      </View>
+    );
+  }
 
   // Create columns for "to be published" section
   const toBePublishedColumns: TableColumn[] = [
@@ -174,7 +186,7 @@ export const TabContentRenderer: React.FC<TabContentRendererProps> = ({
           data={displayedProducts}
           actions={withoutInfoActions}
           onRowPress={onProductPress}
-          emptyMessage="No products without manufacturer info"
+          emptyMessage="No products"
         />
       );
 
