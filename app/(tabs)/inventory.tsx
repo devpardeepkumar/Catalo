@@ -197,6 +197,7 @@ export default function InventoryScreen() {
     <TabContentRenderer
       activeTab={activeTab}
       displayedProducts={displayedProducts}
+      loading={loading}
       tableColumns={tableColumns}
       tableActions={tableActions}
       onProductPress={handleProductPress}
@@ -466,6 +467,7 @@ export default function InventoryScreen() {
           csvHeaders={csvHeaders}
           uploadId={uploadId || ''}
           sampleRows={csvSampleRows}
+          updateOnlyExisting={updateOnlyExisting}
           onBack={handleColumnMappingBack}
           onProcessUpload={handleProcessUpload}
         />
