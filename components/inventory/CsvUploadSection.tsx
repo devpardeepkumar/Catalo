@@ -1,7 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
-// @ts-ignore - papaparse types may not be available
-import Papa from 'papaparse';
 import React, { useState } from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { analyticsApi } from '../../services/api/analyticsApi';
@@ -14,7 +12,7 @@ interface CsvUploadSectionProps {
   onFileSelect: (fileName: string | null, asset: DocumentPicker.DocumentPickerAsset | null) => void;
   onUpdateOnlyChange: (value: boolean) => void;
   onCancel: () => void;
-  onNext: (csvHeaders: string[], sampleRows: any[]) => void;
+  onNext: (csvHeaders: string[], sampleRows: any[], uploadId: string) => void;
 }
 
 export const CsvUploadSection: React.FC<CsvUploadSectionProps> = ({
@@ -56,47 +54,27 @@ export const CsvUploadSection: React.FC<CsvUploadSectionProps> = ({
 
     setIsParsing(true);
     try {
-      // Read the CSV file content for local parsing
-      const response = await fetch(selectedFileAsset.uri);
-      const text = await response.text();
-
       const formData = new FormData();
-      // @ts-ignore
-      formData.append('file', { uri: selectedFileAsset.uri, name: selectedFileAsset.name, type: selectedFileAsset.mimeType  ?? 'text/csv'});
+      // @ts-ignore - React Native file object for FormData
+      formData.append('file', { uri: selectedFileAsset.uri, name: selectedFileAsset.name, type: selectedFileAsset.mimeType ?? 'text/csv' });
 
-      const apiResponse:any = await analyticsApi.uploadCsv(formData);
-      console.log('CSV Upload API Response:', apiResponse);
-      console.log('First Sample Row:', apiResponse.data.sampleRows);
+      const apiResponse: any = await analyticsApi.uploadCsv(formData);
+
+      if (!apiResponse?.success || !apiResponse?.data) {
+        Alert.alert('Error', apiResponse?.error?.message || 'Upload failed. Please try again.');
+        return;
+      }
+
+      const { headers = [], sampleRows = [], uploadId } = apiResponse.data;
+
+      // Optional: log full response (console abbreviates nested objects; this shows full sampleRows)
+      if (__DEV__) {
+        console.log('CSV Upload API Response:', JSON.stringify(apiResponse, null, 2));
+      }
 
       Alert.alert('Success', 'CSV file uploaded successfully!');
 
-      // Parse CSV to get headers after successful upload
-      Papa.parse(text, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results: any) => {
-          if (results.errors && results.errors.length > 0) {
-            Alert.alert('Error', 'Failed to parse CSV file for headers. Please check the file format.');
-            onNext([], apiResponse.data.sampleRows || []); // Call onNext even if parsing fails for headers
-            return;
-          }
-
-          const headers = results.meta?.fields || [];
-          
-          if (headers.length === 0 && results.data && results.data.length > 0) {
-            const firstRow = results.data[0] as Record<string, string>;
-            const extractedHeaders = Object.keys(firstRow);
-            onNext(extractedHeaders, apiResponse.data.sampleRows || []);
-          } else {
-            onNext(headers, apiResponse.data.sampleRows || []);
-          }
-        },
-        error: (error: any) => {
-          Alert.alert('Error', `Failed to parse CSV for headers: ${error?.message || 'Unknown error'}`);
-          onNext([], apiResponse.data.sampleRows || []); // Call onNext even if parsing fails for headers
-        },
-      });
-
+      onNext(headers, sampleRows, uploadId || '');
     } catch (error) {
       console.error('Error processing CSV:', error);
       Alert.alert('Error', 'Failed to process CSV file. Please try again.');
